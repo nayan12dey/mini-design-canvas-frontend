@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   MousePointer2,
   Hand,
@@ -14,13 +14,22 @@ import {
   Minus,
   ArrowUpRight,
   Star,
-  Sparkles,
-  Layers,
-  Palette
 } from "lucide-react";
+import { useCanvas } from "@/context/CanvasContext";
 
 export default function Toolbar() {
-  const [activeTool, setActiveTool] = useState("select");
+  const { activeTool, setActiveTool, addRectangle, addCircle, addText } = useCanvas();
+
+  const handleToolClick = (toolId) => {
+    setActiveTool(toolId);
+    if (toolId === "rect") {
+      addRectangle();
+    } else if (toolId === "circle") {
+      addCircle();
+    } else if (toolId === "text") {
+      addText();
+    }
+  };
 
   const primaryTools = [
     { id: "select", name: "Select Tool", icon: MousePointer2, shortcut: "V" },
@@ -28,8 +37,8 @@ export default function Toolbar() {
   ];
 
   const shapeTools = [
-    { id: "rect", name: "Rectangle", icon: Square, shortcut: "R" },
-    { id: "circle", name: "Circle / Ellipse", icon: Circle, shortcut: "O" },
+    { id: "rect", name: "Add Rectangle", icon: Square, shortcut: "R" },
+    { id: "circle", name: "Add Circle", icon: Circle, shortcut: "O" },
     { id: "triangle", name: "Triangle", icon: Triangle, shortcut: "Y" },
     { id: "line", name: "Line", icon: Minus, shortcut: "L" },
     { id: "arrow", name: "Arrow", icon: ArrowUpRight, shortcut: "A" },
@@ -37,7 +46,7 @@ export default function Toolbar() {
   ];
 
   const contentTools = [
-    { id: "text", name: "Text", icon: Type, shortcut: "T" },
+    { id: "text", name: "Add Text", icon: Type, shortcut: "T" },
     { id: "draw", name: "Pen / Pencil", icon: PenTool, shortcut: "P" },
     { id: "image", name: "Upload Image", icon: ImageIcon, shortcut: "I" },
     { id: "eraser", name: "Eraser", icon: Eraser, shortcut: "E" },
@@ -56,7 +65,7 @@ export default function Toolbar() {
               <button
                 key={tool.id}
                 type="button"
-                onClick={() => setActiveTool(tool.id)}
+                onClick={() => handleToolClick(tool.id)}
                 title={`${tool.name} (${tool.shortcut})`}
                 className={`relative group w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-150 ${
                   isActive
@@ -90,7 +99,7 @@ export default function Toolbar() {
               <button
                 key={tool.id}
                 type="button"
-                onClick={() => setActiveTool(tool.id)}
+                onClick={() => handleToolClick(tool.id)}
                 title={`${tool.name} (${tool.shortcut})`}
                 className={`relative group w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-150 ${
                   isActive
@@ -122,7 +131,7 @@ export default function Toolbar() {
               <button
                 key={tool.id}
                 type="button"
-                onClick={() => setActiveTool(tool.id)}
+                onClick={() => handleToolClick(tool.id)}
                 title={`${tool.name} (${tool.shortcut})`}
                 className={`relative group w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-150 ${
                   isActive

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import dynamic from "next/dynamic";
+import { useCanvas } from "@/context/CanvasContext";
 import CanvasControls from "./CanvasControls";
 import { Loader2 } from "lucide-react";
 
@@ -9,15 +10,15 @@ import { Loader2 } from "lucide-react";
 const KonvaStage = dynamic(() => import("./KonvaStage"), {
   ssr: false,
   loading: () => (
-    <div className="w-[900px] h-[600px] rounded-xl bg-[#12151f] border border-[#262c3e] flex flex-col items-center justify-center space-y-3 text-zinc-400">
+    <div className="w-[864px] h-[576px] rounded-xl bg-[#12151f] border border-[#262c3e] flex flex-col items-center justify-center space-y-3 text-zinc-400">
       <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
-      <span className="text-xs font-medium">Initializing Konva 1200×800 Canvas...</span>
+      <span className="text-xs font-medium">Initializing Konva Canvas...</span>
     </div>
   ),
 });
 
 export default function CanvasArea() {
-  const [zoomScale, setZoomScale] = useState(0.72);
+  const { zoomScale } = useCanvas();
 
   return (
     <main className="flex-1 h-full relative overflow-hidden bg-[#0c0e14] flex flex-col justify-center items-center select-none">
@@ -32,7 +33,7 @@ export default function CanvasArea() {
       </div>
 
       {/* Konva Canvas Stage Container */}
-      <div className="relative z-10 flex items-center justify-center p-4">
+      <div className="relative z-10 flex items-center justify-center p-4 overflow-auto max-w-full max-h-full">
         <KonvaStage width={1200} height={800} scale={zoomScale} />
       </div>
 
