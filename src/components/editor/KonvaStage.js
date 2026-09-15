@@ -7,300 +7,15 @@ import { useCanvas } from "@/context/CanvasContext";
 export const CANVAS_WIDTH = 1200;
 export const CANVAS_HEIGHT = 800;
 
-function RectangleElement({
-  shapeProps,
-  isSelected,
-  onSelect,
-  onChange,
-}) {
-  const shapeRef = useRef(null);
-  const trRef = useRef(null);
-
-  useEffect(() => {
-    if (isSelected && trRef.current && shapeRef.current) {
-      trRef.current.nodes([shapeRef.current]);
-      trRef.current.getLayer()?.batchDraw();
-    }
-  }, [isSelected]);
-
-  return (
-    <>
-      <Rect
-        ref={shapeRef}
-        {...shapeProps}
-        draggable={shapeProps.draggable !== false}
-        onClick={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        onTap={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        onMouseEnter={(e) => {
-          const container = e.target.getStage()?.container();
-          if (container) container.style.cursor = "move";
-        }}
-        onMouseLeave={(e) => {
-          const container = e.target.getStage()?.container();
-          if (container) container.style.cursor = "default";
-        }}
-        onDragStart={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        onDragEnd={(e) => {
-          onChange({
-            ...shapeProps,
-            x: Math.round(e.target.x()),
-            y: Math.round(e.target.y()),
-          });
-        }}
-        onTransformEnd={() => {
-          const node = shapeRef.current;
-          if (!node) return;
-          const scaleX = node.scaleX();
-          const scaleY = node.scaleY();
-
-          node.scaleX(1);
-          node.scaleY(1);
-
-          onChange({
-            ...shapeProps,
-            x: Math.round(node.x()),
-            y: Math.round(node.y()),
-            width: Math.max(10, Math.round(node.width() * scaleX)),
-            height: Math.max(10, Math.round(node.height() * scaleY)),
-            rotation: Math.round(node.rotation()),
-          });
-        }}
-      />
-      {isSelected && (
-        <Transformer
-          ref={trRef}
-          boundBoxFunc={(oldBox, newBox) => {
-            if (Math.abs(newBox.width) < 15 || Math.abs(newBox.height) < 15) {
-              return oldBox;
-            }
-            return newBox;
-          }}
-          anchorSize={9}
-          anchorCornerRadius={2}
-          anchorFill="#ffffff"
-          anchorStroke="#6366f1"
-          anchorStrokeWidth={2}
-          borderStroke="#6366f1"
-          borderStrokeWidth={1.5}
-          borderDash={[4, 4]}
-          rotateAnchorOffset={24}
-        />
-      )}
-    </>
-  );
-}
-
-function CircleElement({
-  shapeProps,
-  isSelected,
-  onSelect,
-  onChange,
-}) {
-  const shapeRef = useRef(null);
-  const trRef = useRef(null);
-
-  useEffect(() => {
-    if (isSelected && trRef.current && shapeRef.current) {
-      trRef.current.nodes([shapeRef.current]);
-      trRef.current.getLayer()?.batchDraw();
-    }
-  }, [isSelected]);
-
-  return (
-    <>
-      <Circle
-        ref={shapeRef}
-        {...shapeProps}
-        draggable={shapeProps.draggable !== false}
-        onClick={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        onTap={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        onMouseEnter={(e) => {
-          const container = e.target.getStage()?.container();
-          if (container) container.style.cursor = "move";
-        }}
-        onMouseLeave={(e) => {
-          const container = e.target.getStage()?.container();
-          if (container) container.style.cursor = "default";
-        }}
-        onDragStart={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        onDragEnd={(e) => {
-          onChange({
-            ...shapeProps,
-            x: Math.round(e.target.x()),
-            y: Math.round(e.target.y()),
-          });
-        }}
-        onTransformEnd={() => {
-          const node = shapeRef.current;
-          if (!node) return;
-          const scaleX = node.scaleX();
-
-          node.scaleX(1);
-          node.scaleY(1);
-
-          onChange({
-            ...shapeProps,
-            x: Math.round(node.x()),
-            y: Math.round(node.y()),
-            radius: Math.max(10, Math.round(node.radius() * scaleX)),
-            rotation: Math.round(node.rotation()),
-          });
-        }}
-      />
-      {isSelected && (
-        <Transformer
-          ref={trRef}
-          enabledAnchors={["top-left", "top-right", "bottom-left", "bottom-right"]}
-          keepRatio={true}
-          boundBoxFunc={(oldBox, newBox) => {
-            if (Math.abs(newBox.width) < 15 || Math.abs(newBox.height) < 15) {
-              return oldBox;
-            }
-            return newBox;
-          }}
-          anchorSize={9}
-          anchorCornerRadius={2}
-          anchorFill="#ffffff"
-          anchorStroke="#a855f7"
-          anchorStrokeWidth={2}
-          borderStroke="#a855f7"
-          borderStrokeWidth={1.5}
-          borderDash={[4, 4]}
-          rotateAnchorOffset={24}
-        />
-      )}
-    </>
-  );
-}
-
-function TextElement({
-  shapeProps,
-  isSelected,
-  onSelect,
-  onChange,
-  onStartEditing,
-}) {
-  const shapeRef = useRef(null);
-  const trRef = useRef(null);
-
-  useEffect(() => {
-    if (isSelected && trRef.current && shapeRef.current) {
-      trRef.current.nodes([shapeRef.current]);
-      trRef.current.getLayer()?.batchDraw();
-    }
-  }, [isSelected]);
-
-  const handleDblClick = (e) => {
-    e.cancelBubble = true;
-    const node = shapeRef.current;
-    if (node && onStartEditing) {
-      onStartEditing(shapeProps, node);
-    }
-  };
-
-  return (
-    <>
-      <Text
-        ref={shapeRef}
-        {...shapeProps}
-        draggable={shapeProps.draggable !== false}
-        onClick={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        onTap={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        onDblClick={handleDblClick}
-        onDblTap={handleDblClick}
-        onMouseEnter={(e) => {
-          const container = e.target.getStage()?.container();
-          if (container) container.style.cursor = "move";
-        }}
-        onMouseLeave={(e) => {
-          const container = e.target.getStage()?.container();
-          if (container) container.style.cursor = "default";
-        }}
-        onDragStart={(e) => {
-          e.cancelBubble = true;
-          onSelect();
-        }}
-        onDragEnd={(e) => {
-          onChange({
-            ...shapeProps,
-            x: Math.round(e.target.x()),
-            y: Math.round(e.target.y()),
-          });
-        }}
-        onTransformEnd={() => {
-          const node = shapeRef.current;
-          if (!node) return;
-          const scaleX = node.scaleX();
-
-          node.scaleX(1);
-          node.scaleY(1);
-
-          onChange({
-            ...shapeProps,
-            x: Math.round(node.x()),
-            y: Math.round(node.y()),
-            width: Math.max(50, Math.round(node.width() * scaleX)),
-            rotation: Math.round(node.rotation()),
-          });
-        }}
-      />
-      {isSelected && (
-        <Transformer
-          ref={trRef}
-          enabledAnchors={["middle-left", "middle-right", "top-left", "top-right", "bottom-left", "bottom-right"]}
-          boundBoxFunc={(oldBox, newBox) => {
-            if (Math.abs(newBox.width) < 30 || Math.abs(newBox.height) < 15) {
-              return oldBox;
-            }
-            return newBox;
-          }}
-          anchorSize={9}
-          anchorCornerRadius={2}
-          anchorFill="#ffffff"
-          anchorStroke="#3b82f6"
-          anchorStrokeWidth={2}
-          borderStroke="#3b82f6"
-          borderStrokeWidth={1.5}
-          borderDash={[4, 4]}
-          rotateAnchorOffset={24}
-        />
-      )}
-    </>
-  );
-}
-
 export default function KonvaStage({
   width = CANVAS_WIDTH,
   height = CANVAS_HEIGHT,
   scale = 1,
 }) {
   const stageRef = useRef(null);
+  const transformerRef = useRef(null);
   const containerRef = useRef(null);
-  const [editingText, setEditingText] = useState(null); // { id, text, x, y, width, fontSize, ... }
+  const [editingText, setEditingText] = useState(null);
 
   const {
     elements,
@@ -309,6 +24,68 @@ export default function KonvaStage({
     deselectAll,
     updateElement,
   } = useCanvas();
+
+  const selectedElement = elements.find((el) => el.id === selectedId) || null;
+
+  // Sync Transformer with selected node
+  useEffect(() => {
+    if (!transformerRef.current || !stageRef.current) return;
+
+    if (selectedId && !editingText) {
+      const selectedNode = stageRef.current.findOne("#" + selectedId);
+      if (selectedNode) {
+        transformerRef.current.nodes([selectedNode]);
+        
+        // Configure transformer based on element type
+        if (selectedElement?.type === "circle") {
+          transformerRef.current.enabledAnchors([
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+          ]);
+          transformerRef.current.keepRatio(true);
+          transformerRef.current.anchorStroke("#a855f7");
+          transformerRef.current.borderStroke("#a855f7");
+        } else if (selectedElement?.type === "text") {
+          transformerRef.current.enabledAnchors([
+            "middle-left",
+            "middle-right",
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+          ]);
+          transformerRef.current.keepRatio(false);
+          transformerRef.current.anchorStroke("#3b82f6");
+          transformerRef.current.borderStroke("#3b82f6");
+        } else {
+          // Rectangle or standard
+          transformerRef.current.enabledAnchors([
+            "top-left",
+            "top-center",
+            "top-right",
+            "middle-right",
+            "bottom-right",
+            "bottom-center",
+            "bottom-left",
+            "middle-left",
+          ]);
+          transformerRef.current.keepRatio(false);
+          transformerRef.current.anchorStroke("#6366f1");
+          transformerRef.current.borderStroke("#6366f1");
+        }
+
+        transformerRef.current.getLayer()?.batchDraw();
+      } else {
+        transformerRef.current.nodes([]);
+        transformerRef.current.getLayer()?.batchDraw();
+      }
+    } else {
+      transformerRef.current.nodes([]);
+      transformerRef.current.getLayer()?.batchDraw();
+    }
+  }, [selectedId, elements, editingText, selectedElement?.type]);
 
   const handleStageClick = (e) => {
     // If inline editing text, finish it
@@ -321,7 +98,7 @@ export default function KonvaStage({
     }
   };
 
-  const startTextEditing = (shapeProps, node) => {
+  const startTextEditing = (shapeProps) => {
     setEditingText({
       id: shapeProps.id,
       text: shapeProps.text,
@@ -401,7 +178,7 @@ export default function KonvaStage({
             />
             <Text
               x={130}
-              text="• Click to select, drag to move, double-click text to edit"
+              text="• Click to select, drag to move, double-click text to edit, use inspector to tune"
               fontSize={13}
               fontFamily="sans-serif"
               fill="#334155"
@@ -412,44 +189,195 @@ export default function KonvaStage({
           {elements.map((el) => {
             if (el.type === "rect") {
               return (
-                <RectangleElement
+                <Rect
                   key={el.id}
-                  shapeProps={el}
-                  isSelected={el.id === selectedId}
-                  onSelect={() => selectElement(el.id)}
-                  onChange={(newAttrs) => updateElement(el.id, newAttrs)}
+                  id={el.id}
+                  name={el.id}
+                  {...el}
+                  draggable={el.draggable !== false}
+                  onClick={(e) => {
+                    e.cancelBubble = true;
+                    selectElement(el.id);
+                  }}
+                  onTap={(e) => {
+                    e.cancelBubble = true;
+                    selectElement(el.id);
+                  }}
+                  onMouseEnter={(e) => {
+                    const container = e.target.getStage()?.container();
+                    if (container) container.style.cursor = "move";
+                  }}
+                  onMouseLeave={(e) => {
+                    const container = e.target.getStage()?.container();
+                    if (container) container.style.cursor = "default";
+                  }}
+                  onDragStart={(e) => {
+                    e.cancelBubble = true;
+                    selectElement(el.id);
+                  }}
+                  onDragEnd={(e) => {
+                    updateElement(el.id, {
+                      x: Math.round(e.target.x()),
+                      y: Math.round(e.target.y()),
+                    });
+                  }}
+                  onTransformEnd={(e) => {
+                    const node = e.target;
+                    const scaleX = node.scaleX();
+                    const scaleY = node.scaleY();
+
+                    node.scaleX(1);
+                    node.scaleY(1);
+
+                    updateElement(el.id, {
+                      x: Math.round(node.x()),
+                      y: Math.round(node.y()),
+                      width: Math.max(10, Math.round(node.width() * scaleX)),
+                      height: Math.max(10, Math.round(node.height() * scaleY)),
+                      rotation: Math.round(node.rotation()),
+                    });
+                  }}
                 />
               );
             }
+
             if (el.type === "circle") {
               return (
-                <CircleElement
+                <Circle
                   key={el.id}
-                  shapeProps={el}
-                  isSelected={el.id === selectedId}
-                  onSelect={() => selectElement(el.id)}
-                  onChange={(newAttrs) => updateElement(el.id, newAttrs)}
+                  id={el.id}
+                  name={el.id}
+                  {...el}
+                  draggable={el.draggable !== false}
+                  onClick={(e) => {
+                    e.cancelBubble = true;
+                    selectElement(el.id);
+                  }}
+                  onTap={(e) => {
+                    e.cancelBubble = true;
+                    selectElement(el.id);
+                  }}
+                  onMouseEnter={(e) => {
+                    const container = e.target.getStage()?.container();
+                    if (container) container.style.cursor = "move";
+                  }}
+                  onMouseLeave={(e) => {
+                    const container = e.target.getStage()?.container();
+                    if (container) container.style.cursor = "default";
+                  }}
+                  onDragStart={(e) => {
+                    e.cancelBubble = true;
+                    selectElement(el.id);
+                  }}
+                  onDragEnd={(e) => {
+                    updateElement(el.id, {
+                      x: Math.round(e.target.x()),
+                      y: Math.round(e.target.y()),
+                    });
+                  }}
+                  onTransformEnd={(e) => {
+                    const node = e.target;
+                    const scaleX = node.scaleX();
+
+                    node.scaleX(1);
+                    node.scaleY(1);
+
+                    updateElement(el.id, {
+                      x: Math.round(node.x()),
+                      y: Math.round(node.y()),
+                      radius: Math.max(10, Math.round(node.radius() * scaleX)),
+                      rotation: Math.round(node.rotation()),
+                    });
+                  }}
                 />
               );
             }
+
             if (el.type === "text") {
-              // If currently editing inline, hide the canvas text node so textarea is visible
               if (editingText && editingText.id === el.id) {
                 return null;
               }
               return (
-                <TextElement
+                <Text
                   key={el.id}
-                  shapeProps={el}
-                  isSelected={el.id === selectedId}
-                  onSelect={() => selectElement(el.id)}
-                  onChange={(newAttrs) => updateElement(el.id, newAttrs)}
-                  onStartEditing={startTextEditing}
+                  id={el.id}
+                  name={el.id}
+                  {...el}
+                  draggable={el.draggable !== false}
+                  onClick={(e) => {
+                    e.cancelBubble = true;
+                    selectElement(el.id);
+                  }}
+                  onTap={(e) => {
+                    e.cancelBubble = true;
+                    selectElement(el.id);
+                  }}
+                  onDblClick={(e) => {
+                    e.cancelBubble = true;
+                    startTextEditing(el);
+                  }}
+                  onDblTap={(e) => {
+                    e.cancelBubble = true;
+                    startTextEditing(el);
+                  }}
+                  onMouseEnter={(e) => {
+                    const container = e.target.getStage()?.container();
+                    if (container) container.style.cursor = "move";
+                  }}
+                  onMouseLeave={(e) => {
+                    const container = e.target.getStage()?.container();
+                    if (container) container.style.cursor = "default";
+                  }}
+                  onDragStart={(e) => {
+                    e.cancelBubble = true;
+                    selectElement(el.id);
+                  }}
+                  onDragEnd={(e) => {
+                    updateElement(el.id, {
+                      x: Math.round(e.target.x()),
+                      y: Math.round(e.target.y()),
+                    });
+                  }}
+                  onTransformEnd={(e) => {
+                    const node = e.target;
+                    const scaleX = node.scaleX();
+                    const scaleY = node.scaleY();
+
+                    node.scaleX(1);
+                    node.scaleY(1);
+
+                    updateElement(el.id, {
+                      x: Math.round(node.x()),
+                      y: Math.round(node.y()),
+                      width: Math.max(40, Math.round(node.width() * scaleX)),
+                      fontSize: Math.max(10, Math.round((el.fontSize || 32) * scaleY)),
+                      rotation: Math.round(node.rotation()),
+                    });
+                  }}
                 />
               );
             }
+
             return null;
           })}
+
+          {/* Unified Global Transformer */}
+          <Transformer
+            ref={transformerRef}
+            boundBoxFunc={(oldBox, newBox) => {
+              if (Math.abs(newBox.width) < 15 || Math.abs(newBox.height) < 15) {
+                return oldBox;
+              }
+              return newBox;
+            }}
+            anchorSize={9}
+            anchorCornerRadius={2}
+            anchorFill="#ffffff"
+            anchorStrokeWidth={2}
+            borderStrokeWidth={1.5}
+            borderDash={[4, 4]}
+            rotateAnchorOffset={24}
+          />
         </Layer>
       </Stage>
 
@@ -477,17 +405,19 @@ export default function KonvaStage({
             width: (editingText.width || 320) * scale,
             fontSize: (editingText.fontSize || 32) * scale,
             fontFamily: editingText.fontFamily || "sans-serif",
-            fontWeight: editingText.fontStyle === "bold" ? "bold" : "normal",
+            fontWeight: editingText.fontStyle?.includes("bold") ? "bold" : "normal",
+            fontStyle: editingText.fontStyle?.includes("italic") ? "italic" : "normal",
             color: editingText.fill || "#ffffff",
             textAlign: editingText.align || "left",
             lineHeight: 1.2,
             background: "rgba(18, 21, 31, 0.95)",
             border: "1.5px solid #3b82f6",
             borderRadius: "6px",
-            padding: `${4 * scale}px`,
+            padding: "4px",
             margin: 0,
             outline: "none",
             resize: "none",
+            boxSizing: "border-box",
             transformOrigin: "top left",
             transform: editingText.rotation ? `rotate(${editingText.rotation}deg)` : "none",
             zIndex: 30,
